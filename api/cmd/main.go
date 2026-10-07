@@ -11,8 +11,9 @@ import (
 
 func main() {
 	rabbitURL := os.Getenv("RABBITMQ_URL")
+	rabbitQueue := os.Getenv("RABBITMQ_QUEUE")
 
-	publisher := messaging.NewRabbitMQPublisher(rabbitURL, "shit-pipe")
+	publisher := messaging.NewRabbitMQPublisher(rabbitURL, rabbitQueue)
 	defer publisher.Close()
 
 	svc := services.NewMessengerService(publisher)

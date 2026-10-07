@@ -7,7 +7,7 @@ RUN go mod download
 
 FROM deps AS build
 COPY api/ ./
-RUN CGO_ENABLED=0 GOOS=linux go build -o /southpark-messaging-api ./cmd
+RUN CGO_ENABLED=0 GOOS=linux go build -o /southpark-messaging-api "./cmd"
 
 FROM alpine:3.24 AS runtime
 COPY --from=build /southpark-messaging-api /southpark-messaging-api
