@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"os"
 	"sp-messaging/api/internal/adapters/handler"
 	"sp-messaging/api/internal/adapters/messaging"
@@ -11,10 +10,9 @@ import (
 )
 
 func main() {
-	rabbitURL := flag.String("rabbitmq", envOr("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/"), "RabbitMQ connection URL")
-	flag.Parse()
+	rabbitURL := os.Getenv("RABBITMQ_URL")
 
-	publisher := messaging.NewRabbitMQPublisher(*rabbitURL, "shit-pipe")
+	publisher := messaging.NewRabbitMQPublisher(rabbitURL, "shit-pipe")
 	defer publisher.Close()
 
 	svc := services.NewMessengerService(publisher)
@@ -25,11 +23,4 @@ func main() {
 
 	port := os.Getenv("API_PORT")
 	router.Run(":" + port)
-}
-
-func envOr(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
 }
