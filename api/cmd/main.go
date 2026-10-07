@@ -4,6 +4,7 @@ import (
 	"os"
 	"sp-messaging/api/internal/adapters/handler"
 	"sp-messaging/api/internal/adapters/messaging"
+	"sp-messaging/api/internal/adapters/scheduler"
 	"sp-messaging/api/internal/core/services"
 
 	"github.com/gin-gonic/gin"
@@ -18,10 +19,25 @@ func main() {
 
 	svc := services.NewMessengerService(publisher)
 
+	cronSchedule := os.Getenv("CRON_SCHEDULE")
+	cronScheduler := scheduler.NewCronScheduler(svc)
+	if err := cronScheduler.ScheduleRandomMessages(cronSchedule); err != nil {
+		panic(err)
+	}
+	cronScheduler.Start()
+	defer cronScheduler.Stop()
+
 	router := gin.Default()
 	h := handler.NewHTTPHandler(svc)
 	router.POST("/shit-post", h.PostMessage)
 
 	port := os.Getenv("API_PORT")
 	router.Run(":" + port)
+}
+
+func envOr(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }
