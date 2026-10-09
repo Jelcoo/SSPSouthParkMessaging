@@ -12,9 +12,9 @@ import (
 
 func main() {
 	rabbitURL := os.Getenv("RABBITMQ_URL")
-	rabbitQueue := os.Getenv("RABBITMQ_QUEUE")
+	rabbitExchange := os.Getenv("RABBITMQ_EXCHANGE")
 
-	publisher := messaging.NewRabbitMQPublisher(rabbitURL, rabbitQueue)
+	publisher := messaging.NewRabbitMQPublisher(rabbitURL, rabbitExchange)
 	defer publisher.Close()
 
 	svc := services.NewMessengerService(publisher)
@@ -33,11 +33,4 @@ func main() {
 
 	port := os.Getenv("API_PORT")
 	router.Run(":" + port)
-}
-
-func envOr(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
 }
